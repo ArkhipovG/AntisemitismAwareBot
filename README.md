@@ -24,3 +24,5 @@ This Telegram bot is dedicated to combating antisemitism by providing users with
 
 7. **Alert System**: 
    - Notifies users about recent antisemitic incidents or news updates to stay informed and vigilant.
+
+test
