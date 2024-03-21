@@ -1,2 +1,2 @@
-def pidoras():
-    print('pidoras')
+def chort():
+    pass
