@@ -1,5 +1,7 @@
 import telebot
 import openai
+from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
+from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 
 bot = telebot.TeleBot('7163202910:AAFsjUt2-j0KNtcb-90pTeehCg33H7-HsQc')
 
@@ -76,6 +78,14 @@ def continue_conversation(message):
     response = generate_answer(message.text)
     bot.reply_to(message, response)
     bot.register_next_step_handler(message, continue_conversation)
+
+
+@bot.message_handler(commands=['harmful_list'])
+def harmful_list_command(message):
+    bot.send_message(
+        message.chat.id,
+        f"{ResourcesManager.all_items()}"
+    )
 
 
 bot.polling()
