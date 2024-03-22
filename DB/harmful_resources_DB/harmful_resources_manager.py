@@ -36,7 +36,7 @@ class ResourcesManager:
             connection.close()
             item_str = ''
             for num,item in enumerate(items):
-                item_str += f'Resource №{num}\nResource name: {str(item[1])}\nURL: {str(item[2])}\nHarmful score: {str(item[3])}\n'
+                item_str += f'Resource №{num+1}\nResource name: {str(item[1])}\nURL: {str(item[2])}\nHarmful score: {str(item[3])}\n'
                 item_str += '\n'
             return item_str
         except psycopg2.Error as e:
