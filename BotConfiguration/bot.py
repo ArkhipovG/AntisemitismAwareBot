@@ -60,9 +60,12 @@ def help_command(message):
 
 @bot.message_handler(commands=['talk_with_AI_Psychologist'])
 def talk_command(message):
-    chat_text = message.text.replace('/talk_with_AI_Psychologist', '').strip()
+    chat_text = message.text.replace('/talk_with_AI_Psychologist', "Hello! I'm reaching out to engage in a dialogue "
+                                                                   "with you as a psychologist. Please communicate "
+                                                                   "with me in that capacity. Start with "
+                                                                   "'Hello!'").strip()
     response = generate_answer(chat_text)
-    bot.reply_to(message, response)
+    bot.reply_to(message, response + " To exit conversation press /exit_talk")
     bot.register_next_step_handler(message, continue_conversation)
 
 
