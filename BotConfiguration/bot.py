@@ -58,5 +58,21 @@ def help_command(message):
     )
 
 
+@bot.message_handler(commands=['talk_with_AI_Psychologist'])
+def talk_command(message):
+    chat_text = message.text.replace('/talk_with_AI_Psychologist', '').strip()
+    response = generate_answer(chat_text)
+    bot.reply_to(message, response)
+    bot.register_next_step_handler(message, continue_conversation)
+
+
+def continue_conversation(message):
+    if message.text.lower() == '/exit_talk':
+        bot.reply_to(message, "Exiting conversation. You can start again with /talk_with_AI_Psychologist.")
+        return
+    response = generate_answer(message.text)
+    bot.reply_to(message, response)
+    bot.register_next_step_handler(message, continue_conversation)
+
 
 bot.polling()
