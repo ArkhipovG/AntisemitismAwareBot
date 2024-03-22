@@ -84,8 +84,82 @@ def continue_conversation(message):
 def harmful_list_command(message):
     bot.send_message(
         message.chat.id,
-        f"{ResourcesManager.all_items()}"
+        "What do you want to do?\n"
+        "/insert \n"
+        "/update\n"
+        "/remove\n"
+        "/view_all_resources\n"
     )
+    bot.register_next_step_handler(message, user_input)
+
+
+def user_input(message):
+    if message.text == '/insert':
+        bot.send_message(
+            message.chat.id,
+            "Input comma separated list: vk(name), vk.com(url), 7(score)"
+        )
+        bot.register_next_step_handler(message, insert)
+    elif message.text == '/remove':
+        bot.send_message(
+            message.chat.id,
+            "Input name of the resource you want to remove"
+        )
+        bot.register_next_step_handler(message, remove)
+    elif message.text == '/update':
+        bot.send_message(
+            message.chat.id,
+            "Input name of the resource you want to update"
+        )
+        bot.register_next_step_handler(message, item_to_update)
+    elif message.text == '/view_all_resources':
+        bot.send_message(
+            message.chat.id,
+            f"{ResourcesManager.all_items()}"
+        )
+
+
+def insert(message):
+    list_of_item = message.text.split(",")
+    item = HarmfulResources(list_of_item[0], list_of_item[1], list_of_item[2])
+    item.save()
+    bot.send_message(
+        message.chat.id,
+        "Item saved successfully!"
+    )
+
+
+def remove(message):
+    list_of_item = ResourcesManager.get_by_name(message.text)
+    item = HarmfulResources(list_of_item[1], list_of_item[2], list_of_item[3])
+    item.delete()
+    bot.send_message(
+        message.chat.id,
+        f"{list_of_item}"
+    )
+    bot.send_message(
+        message.chat.id,
+        f"{item}"
+    )
+    bot.send_message(
+        message.chat.id,
+        "Item removed successfully!"
+    )
+
+
+def item_to_update(message):
+    list_of_item = ResourcesManager.get_by_name(message.text)
+    item = HarmfulResources(list_of_item[1], list_of_item[2], list_of_item[3])
+    bot.register_next_step_handler(message, new_update, item)
+    bot.send_message(
+        message.chat.id,
+        "Input new name"
+    )
+    return item
+
+
+def new_update(message, item):
+    item.update(message.text)
 
 
 bot.polling()
