@@ -48,7 +48,7 @@ def help_command(message):
     bot.send_message(
         message.chat.id,
         '1) To receive a list of educational resources press....\n' +
-        '2) To Talk with AI Psychologist press.....\n' +
+        '2) To Talk with AI Psychologist press /talk_with_AI_Psychologist command\n' +
         '3) To receive a list of educational resources press....\n' +
         'buying rates and selling rates.\n' +
         '4) To receive a list of educational resources press....\n' +
