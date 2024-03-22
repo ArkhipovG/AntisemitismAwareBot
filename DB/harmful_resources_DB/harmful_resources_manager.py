@@ -13,7 +13,7 @@ class ResourcesManager:
             cursor.close()
             connection.close()
             if item:
-                return item
+                return item[1:]
             else:
                 return None
         except psycopg2.Error as e:
@@ -30,12 +30,15 @@ class ResourcesManager:
             items = cursor.fetchall()
             cursor.close()
             connection.close()
-            return items
+            item_str = ''
+            for item in items:
+                item_str += str(item[1]) + ' ' + str(item[2]) + ' ' + str(item[3])
+                item_str += '\n'
+            return item_str
         except psycopg2.Error as e:
             print("Error while fetching all items:", e)
             return None
 
 if __name__ == '__main__':
     print(*ResourcesManager.get_by_name('Vkontakte'))
-    for item in ResourcesManager.all_items():
-        print(*item)
+    print(ResourcesManager.all_items())
