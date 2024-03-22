@@ -37,4 +37,26 @@ def start_command(message):
     )
 
 
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.add(
+        telebot.types.InlineKeyboardButton(
+            'Message the developer', url='telegram.me/blkmrkt8'
+        )
+    )
+    bot.send_message(
+        message.chat.id,
+        '1) To receive a list of educational resources press....\n' +
+        '2) To Talk with AI Psychologist press.....\n' +
+        '3) To receive a list of educational resources press....\n' +
+        'buying rates and selling rates.\n' +
+        '4) To receive a list of educational resources press....\n' +
+        '5) To receive a list of educational resources press....\n' +
+        '6) To receive a list of educational resources press....\n' +
+        '7) To receive a list of educational resources press....\n'
+    )
+
+
+
 bot.polling()
