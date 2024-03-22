@@ -88,4 +88,21 @@ def harmful_list_command(message):
     )
 
 
+@bot.message_handler(commands=['text_analyzer'])
+def talk_command(message):
+    bot.send_message(
+        message.chat.id,
+        "Input your text to analyze for antisemitic language or sentiment"
+    )
+    bot.register_next_step_handler(message, analyze_text)
+
+
+def analyze_text(message):
+    response = generate_answer("Analyse this text for antisemitic language or sentiment: " + message.text)
+    bot.reply_to(message, response)
+
+
+
+
+
 bot.polling()
