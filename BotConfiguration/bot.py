@@ -6,6 +6,8 @@ from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
 from Quiz import questions
+from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesManager
+from DB.usefull_resources_DB.usefull_resources_class import UsefulResources
 bot = telebot.TeleBot(keys.telegram_token)
 
 openai.api_key = keys.chat_gpt_token
@@ -233,6 +235,12 @@ def quiz_command(message):
     start_quiz(message)
 
 
+@bot.message_handler(commands=['educational_list'])
+def educational_list_command(message):
+    bot.send_message(
+        message.chat.id,
+        f"{UsefulResourcesManager.all_items()}"
+    )
 
 
 bot.polling()
