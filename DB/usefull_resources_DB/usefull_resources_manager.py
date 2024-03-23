@@ -13,9 +13,9 @@ class UsefulResourcesManager:
             cursor.close()
             connection.close()
             res_name = item[1]
-            article_name = item[2]
+            res_title = item[2]
             resource_url = item[3]
-            stroke = f'Resource name: {res_name}\nArticle: {article_name}\nURL: {resource_url}\n'
+            stroke = f'Resource name: {res_name}\nTitle: {res_title}\nURL: {resource_url}\n'
             if item:
                 return stroke
             else:
@@ -36,7 +36,7 @@ class UsefulResourcesManager:
             connection.close()
             item_str = ''
             for num,item in enumerate(items):
-                item_str += f'Resource №{num+1}:\nResource name: {str(item[1])}\nArticle: {str(item[2])}\nURL: {str(item[3])}\n'
+                item_str += f'Resource №{num+1}:\nResource name: {str(item[1])}\nTitle: {str(item[2])}\nURL: {str(item[3])}\n'
                 item_str += '\n'
             return item_str
         except psycopg2.Error as e:
@@ -44,5 +44,5 @@ class UsefulResourcesManager:
             return None
 
 if __name__ == '__main__':
-    print(UsefulResourcesManager.get_by_name('Anti Defamation League'))
+    print(UsefulResourcesManager.get_by_name('Museum of Jewish Heritage - A Living Memorial to the Holocaust'))
     print(UsefulResourcesManager.all_items())
