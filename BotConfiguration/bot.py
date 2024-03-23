@@ -2,7 +2,7 @@ import telebot
 import openai
 from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
-
+from DB.News_request.get_news import get_random_article
 bot = telebot.TeleBot('7163202910:AAFsjUt2-j0KNtcb-90pTeehCg33H7-HsQc')
 
 openai.api_key = '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'
@@ -176,6 +176,12 @@ def analyze_text(message):
     bot.reply_to(message, response)
 
 
+@bot.message_handler(commands=['latest'])
+def latest_news(message):
+    bot.send_message(
+        message.chat.id,
+        f"{get_random_article()}"
+    )
 
 
 
