@@ -96,15 +96,15 @@ def help_command(message):
     )
     bot.send_message(
         message.chat.id,
-        '1) To receive a list of educational resources press /educational_list\n' +
-        '2) To receive or edit a list of harmful resources press /harmful_list\n' +
-        '3) To talk with AI psychologist press /talk_with_AI_Psychologist \n' +
-        '4) To analyze text for antisemitic language or sentiment press /text_analyzer\n' +
-        '5) Test your antisemitism knowledge - take the /quiz\n' +
-        '6) To anonymously report incidents of antisemitism encountered online or in communities. press /report\n' +
-        '7) To receive a list of resources to join group discussions, share experiences, and connect with '
+        'To receive a list of educational resources press /educational_list\n' +
+        'To receive or edit a list of harmful resources press /harmful_list\n' +
+        'To talk with AI psychologist press /psychologist \n' +
+        'To analyze text for antisemitic language or sentiment press /text_analyzer\n' +
+        'Test your antisemitism knowledge - take the /quiz\n' +
+        'To anonymously report incidents of antisemitism encountered online or in communities. press /report\n' +
+        'To receive a list of resources to join group discussions, share experiences, and connect with '
         'others interested in combating antisemitism press /community_list\n' +
-        '8) To receive last updates on antisemitic incidents and news articles related to antisemitism press /latest'
+        'To receive last updates on antisemitic incidents and news articles related to antisemitism press /latest'
     )
 
 
