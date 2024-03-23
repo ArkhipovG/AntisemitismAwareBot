@@ -5,3 +5,10 @@ quiz_data = {
     "Likening the Gaza Strip to the Warsaw Ghetto is a form of this antisemitic trope or term:": ["Holocaust distortion", "Zionist Occupied Government (ZOG)", "Deadly exchange", "Blood Libel"],
     "This claim suggests that Jews run Hollywood, accusing them of using their influence in order to gain control…": ["Jewish agents", "Poisoning the well", "Globalist", "Jewish figures"]
 }
+
+quiz_answers = {"The blood libel charge falsely accuses Jews of...?": "All of them",
+                "Associating Jews with greed can be found in": "All of them",
+                "Hamas terrorists and pro-Palestinian activists have popularized this phrase that calls for the erasing of the State of Israel and its people…": '"From the River to the Sea"',
+                "Likening the Gaza Strip to the Warsaw Ghetto is a form of this antisemitic trope or term:": "Holocaust distortion",
+                "This claim suggests that Jews run Hollywood, accusing them of using their influence in order to gain control…": "Jewish agents"
+                }

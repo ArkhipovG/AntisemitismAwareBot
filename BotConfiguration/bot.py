@@ -7,9 +7,9 @@ from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
 from Quiz import questions
 from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesManager
-from DB.usefull_resources_DB.usefull_resources_class import UsefulResources
 from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
+
 bot = telebot.TeleBot(keys.telegram_token)
 
 openai.api_key = keys.chat_gpt_token
@@ -34,40 +34,41 @@ def generate_answer(text):
     return result
 
 
-
 def start_quiz(message):
     quiz_state = {"questions": list(questions.quiz_data.keys()), "correct_answers": 0}
     ask_question(message, quiz_state)
+
 
 def ask_question(message, quiz_state):
     if quiz_state["questions"]:
         question = random.choice(quiz_state["questions"])
         quiz_state["questions"].remove(question)
-        correct_answer = questions.quiz_data[question][0]
         random.shuffle(questions.quiz_data[question])
         quiz_message = f"{question}\n\n"
         for idx, answer in enumerate(questions.quiz_data[question]):
             quiz_message += f"{idx + 1}. {answer}\n"
         quiz_message += "\nReply with the number of the correct answer."
         bot.reply_to(message, quiz_message)
-        bot.register_next_step_handler(message, check_answer, correct_answer, quiz_state, question)
+        bot.register_next_step_handler(message, check_answer, quiz_state, question)
     else:
         end_quiz(message, quiz_state)
 
-def check_answer(message, correct_answer, quiz_state, question):
+
+def check_answer(message, quiz_state, question):
     try:
         user_answer_index = int(message.text) - 1
-        if questions.quiz_data[question][user_answer_index] == correct_answer:
+        if questions.quiz_data[question][user_answer_index] == questions.quiz_answers[question]:
             response_message = "Correct! 🎉"
             quiz_state["correct_answers"] += 1
             bot.send_message(message.chat.id, response_message)
         else:
-            response_message = f"Sorry, the correct answer is {correct_answer}."
+            response_message = f"Sorry, the correct answer is {questions.quiz_answers[question]}."
             bot.send_message(message.chat.id, response_message)
         ask_question(message, quiz_state)
     except (ValueError, IndexError):
         response_message = "Please reply with the number of the correct answer."
         bot.reply_to(message, response_message)
+
 
 def end_quiz(message, quiz_state):
     result_message = f"Quiz ended! You answered {quiz_state['correct_answers']} out of {len(questions.quiz_data)} questions correctly."
@@ -111,9 +112,9 @@ def help_command(message):
 @bot.message_handler(commands=['psychologist'])
 def talk_command(message):
     chat_text = message.text.replace('/psychologist', "Hello! I'm reaching out to engage in a dialogue "
-                                                                   "with you as a psychologist. Please communicate "
-                                                                   "with me in that capacity. Start with "
-                                                                   "'Hello!'").strip()
+                                                      "with you as a psychologist. Please communicate "
+                                                      "with me in that capacity. Start with "
+                                                      "'Hello!'").strip()
     response = generate_answer(chat_text)
     bot.reply_to(message, response + " To exit conversation press /exit_talk")
     bot.register_next_step_handler(message, continue_conversation)
@@ -244,6 +245,7 @@ def educational_list_command(message):
         f"{UsefulResourcesManager.all_items()}"
     )
 
+
 @bot.message_handler(commands=['report'])
 def report_command(message):
     bot.send_message(
@@ -251,6 +253,7 @@ def report_command(message):
         f"Input title of the incident"
     )
     bot.register_next_step_handler(message, register_title)
+
 
 def register_title(message):
     title = message.text
@@ -260,6 +263,7 @@ def register_title(message):
     )
     bot.register_next_step_handler(message, register_info, title)
 
+
 def register_info(message, title):
     info = message.text
     bot.send_message(
@@ -268,6 +272,7 @@ def register_info(message, title):
     )
     bot.register_next_step_handler(message, register_date, title, info)
 
+
 def register_date(message, title, info):
     date = message.text
     bot.send_message(
@@ -275,6 +280,7 @@ def register_date(message, title, info):
         f"Input was ir online or not('1' - online, '2' - offline)"
     )
     bot.register_next_step_handler(message, register_is_online, title, info, date)
+
 
 def register_is_online(message, title, info, date):
     is_online = None
@@ -288,10 +294,6 @@ def register_is_online(message, title, info, date):
         item.save()
     bot.send_message(message.chat.id, f"Incident successfully registered")
     bot.send_message(message.chat.id, f"{IncidentsManager.all_items()}")
-
-
-
-
 
 
 bot.polling()
