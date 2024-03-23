@@ -1,7 +1,7 @@
 import psycopg2
 
 
-class ResourcesManager:
+class UsefulResourcesManager:
     @classmethod
     def get_by_name(cls, resource_name):
         try:
@@ -44,5 +44,5 @@ class ResourcesManager:
             return None
 
 if __name__ == '__main__':
-    print(ResourcesManager.get_by_name('Anti Defamation League'))
-    print(ResourcesManager.all_items())
+    print(UsefulResourcesManager.get_by_name('Anti Defamation League'))
+    print(UsefulResourcesManager.all_items())
