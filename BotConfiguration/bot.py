@@ -1,13 +1,14 @@
 import telebot
 import openai
 import random
+import keys
 from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
 from Quiz import questions
-bot = telebot.TeleBot('7163202910:AAFsjUt2-j0KNtcb-90pTeehCg33H7-HsQc')
+bot = telebot.TeleBot(keys.telegram_token)
 
-openai.api_key = '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'
+openai.api_key = keys.chat_gpt_token
 
 
 def generate_answer(text):
@@ -30,53 +31,40 @@ def generate_answer(text):
 
 
 
-# Function to start the quiz
 def start_quiz(message):
-    # Initialize quiz state
     quiz_state = {"questions": list(questions.quiz_data.keys()), "correct_answers": 0}
-    # Start asking questions
     ask_question(message, quiz_state)
 
-# Function to ask a question
 def ask_question(message, quiz_state):
     if quiz_state["questions"]:
-        # Select a random question from the remaining questions
         question = random.choice(quiz_state["questions"])
-        # Remove the selected question from the list of remaining questions
         quiz_state["questions"].remove(question)
         correct_answer = questions.quiz_data[question][0]
-        # Shuffle the answers
         random.shuffle(questions.quiz_data[question])
-        # Send the question and shuffled answers to the user
         quiz_message = f"{question}\n\n"
         for idx, answer in enumerate(questions.quiz_data[question]):
             quiz_message += f"{idx + 1}. {answer}\n"
         quiz_message += "\nReply with the number of the correct answer."
         bot.reply_to(message, quiz_message)
-        # Register the next step handler to handle user responses
         bot.register_next_step_handler(message, check_answer, correct_answer, quiz_state, question)
     else:
-        # End of the quiz
         end_quiz(message, quiz_state)
 
-# Function to check the user's answer
 def check_answer(message, correct_answer, quiz_state, question):
     try:
-        # Convert the user's response to an integer
         user_answer_index = int(message.text) - 1
-        # Check if the user's answer is correct
         if questions.quiz_data[question][user_answer_index] == correct_answer:
             response_message = "Correct! 🎉"
             quiz_state["correct_answers"] += 1
+            bot.send_message(message.chat.id, response_message)
         else:
             response_message = f"Sorry, the correct answer is {correct_answer}."
-        # Ask the next question
+            bot.send_message(message.chat.id, response_message)
         ask_question(message, quiz_state)
     except (ValueError, IndexError):
         response_message = "Please reply with the number of the correct answer."
         bot.reply_to(message, response_message)
 
-# Function to end the quiz and show the result
 def end_quiz(message, quiz_state):
     result_message = f"Quiz ended! You answered {quiz_state['correct_answers']} out of {len(questions.quiz_data)} questions correctly."
     bot.reply_to(message, result_message)
