@@ -1,5 +1,6 @@
 import telebot
 import openai
+import random
 from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
@@ -25,6 +26,64 @@ def generate_answer(text):
         return f"Oops!! Some problems with openAI. Reason: {e}"
 
     return result
+
+
+quiz_data = {
+    "The blood libel charge falsely accuses Jews of...?": ["All of the above", "Israelis eating Palestinian children, harvesting their organs, and/or drinking their blood", "Using blood as an ingredient in ritual breads", "Kidnapping and killing Christian children for their blood"],
+    "Associating Jews with greed can be found in": ["All of the above", "Conspiracy theories about the Rothschilds", "Nazi propaganda", "Shakespeare's The Merchant of Venice"],
+    "Hamas terrorists and pro-Palestinian activists have popularized this phrase that calls for the erasing of the State of Israel and its people…": ['"From the River to the Sea"', '"Jews Will Not Replace Us"', '"Not the Real Jews"', '"Zionism is Racism"']
+}
+
+# Function to start the quiz
+def start_quiz(message):
+    # Initialize quiz state
+    quiz_state = {"questions": list(quiz_data.keys()), "correct_answers": 0}
+    # Start asking questions
+    ask_question(message, quiz_state)
+
+# Function to ask a question
+def ask_question(message, quiz_state):
+    if quiz_state["questions"]:
+        # Select a random question from the remaining questions
+        question = random.choice(quiz_state["questions"])
+        # Remove the selected question from the list of remaining questions
+        quiz_state["questions"].remove(question)
+        correct_answer = quiz_data[question][0]
+        # Shuffle the answers
+        random.shuffle(quiz_data[question])
+        # Send the question and shuffled answers to the user
+        quiz_message = f"{question}\n\n"
+        for idx, answer in enumerate(quiz_data[question]):
+            quiz_message += f"{idx + 1}. {answer}\n"
+        quiz_message += "\nReply with the number of the correct answer."
+        bot.reply_to(message, quiz_message)
+        # Register the next step handler to handle user responses
+        bot.register_next_step_handler(message, check_answer, correct_answer, quiz_state, question)
+    else:
+        # End of the quiz
+        end_quiz(message, quiz_state)
+
+# Function to check the user's answer
+def check_answer(message, correct_answer, quiz_state, question):
+    try:
+        # Convert the user's response to an integer
+        user_answer_index = int(message.text) - 1
+        # Check if the user's answer is correct
+        if quiz_data[question][user_answer_index] == correct_answer:
+            response_message = "Correct! 🎉"
+            quiz_state["correct_answers"] += 1
+        else:
+            response_message = f"Sorry, the correct answer is {correct_answer}."
+        # Ask the next question
+        ask_question(message, quiz_state)
+    except (ValueError, IndexError):
+        response_message = "Please reply with the number of the correct answer."
+        bot.reply_to(message, response_message)
+
+# Function to end the quiz and show the result
+def end_quiz(message, quiz_state):
+    result_message = f"Quiz ended! You answered {quiz_state['correct_answers']} out of {len(quiz_data)} questions correctly."
+    bot.reply_to(message, result_message)
 
 
 @bot.message_handler(commands=['start'])
@@ -182,6 +241,11 @@ def latest_news(message):
         message.chat.id,
         f"{get_random_article()}"
     )
+
+
+@bot.message_handler(commands=['quiz'])
+def quiz_command(message):
+    start_quiz(message)
 
 
 
