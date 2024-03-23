@@ -1,13 +1,14 @@
 import telebot
 import openai
 import random
+import keys
 from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
 from Quiz import questions
-bot = telebot.TeleBot('7163202910:AAFsjUt2-j0KNtcb-90pTeehCg33H7-HsQc')
+bot = telebot.TeleBot(keys.telegram_token)
 
-openai.api_key = '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'
+openai.api_key = keys.chat_gpt_token
 
 
 def generate_answer(text):
