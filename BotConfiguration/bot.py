@@ -8,6 +8,8 @@ from DB.News_request.get_news import get_random_article
 from Quiz import questions
 from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesManager
 from DB.usefull_resources_DB.usefull_resources_class import UsefulResources
+from DB.incidents_db.incidents_class import Incidents
+from DB.incidents_db.incidents_manager import IncidentsManager
 bot = telebot.TeleBot(keys.telegram_token)
 
 openai.api_key = keys.chat_gpt_token
@@ -241,6 +243,55 @@ def educational_list_command(message):
         message.chat.id,
         f"{UsefulResourcesManager.all_items()}"
     )
+
+@bot.message_handler(commands=['report'])
+def report_command(message):
+    bot.send_message(
+        message.chat.id,
+        f"Input title of the incident"
+    )
+    bot.register_next_step_handler(message, register_title)
+
+def register_title(message):
+    title = message.text
+    bot.send_message(
+        message.chat.id,
+        f"Input info about the incident"
+    )
+    bot.register_next_step_handler(message, register_info, title)
+
+def register_info(message, title):
+    info = message.text
+    bot.send_message(
+        message.chat.id,
+        f"Input date of the incident (format: YYYY-MM-DD)"
+    )
+    bot.register_next_step_handler(message, register_date, title, info)
+
+def register_date(message, title, info):
+    date = message.text
+    bot.send_message(
+        message.chat.id,
+        f"Input was ir online or not('1' - online, '2' - offline)"
+    )
+    bot.register_next_step_handler(message, register_is_online, title, info, date)
+
+def register_is_online(message, title, info, date):
+    is_online = None
+    if message.text == "1":
+        is_online = True
+    elif message.text == "2":
+        is_online = False
+
+    if is_online is not None:
+        item = Incidents(title=title, info=info, date=date, is_online=is_online)
+        item.save()
+    bot.send_message(message.chat.id, f"Incident successfully registered")
+    bot.send_message(message.chat.id, f"{IncidentsManager.all_items()}")
+
+
+
+
 
 
 bot.polling()
