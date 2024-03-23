@@ -58,9 +58,9 @@ def help_command(message):
     )
 
 
-@bot.message_handler(commands=['talk_with_AI_Psychologist'])
+@bot.message_handler(commands=['psychologist'])
 def talk_command(message):
-    chat_text = message.text.replace('/talk_with_AI_Psychologist', "Hello! I'm reaching out to engage in a dialogue "
+    chat_text = message.text.replace('/psychologist', "Hello! I'm reaching out to engage in a dialogue "
                                                                    "with you as a psychologist. Please communicate "
                                                                    "with me in that capacity. Start with "
                                                                    "'Hello!'").strip()
