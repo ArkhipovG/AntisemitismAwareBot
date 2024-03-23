@@ -9,6 +9,7 @@ from Quiz import questions
 from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesManager
 from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
+import Community.community_resources
 
 bot = telebot.TeleBot(keys.telegram_token)
 
@@ -294,6 +295,13 @@ def register_is_online(message, title, info, date):
         item.save()
     bot.send_message(message.chat.id, f"Incident successfully registered")
     bot.send_message(message.chat.id, f"{IncidentsManager.all_items()}")
+
+@bot.message_handler(commands=['community'])
+def community_command(message):
+    bot.send_message(
+        message.chat.id,
+        f"{Community.community_resources.print_resources()}"
+    )
 
 
 bot.polling()
