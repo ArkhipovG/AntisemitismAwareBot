@@ -1,7 +1,7 @@
 import psycopg2
 
 
-class ResourcesManager:
+class IncidentsManager:
     @classmethod
     def get_by_name(cls, title):
         try:
@@ -45,5 +45,5 @@ class ResourcesManager:
             return None
 
 if __name__ == '__main__':
-    print(ResourcesManager.get_by_name('Bulling'))
-    print(ResourcesManager.all_items())
+    print(IncidentsManager.get_by_name('Bulling'))
+    print(IncidentsManager.all_items())
