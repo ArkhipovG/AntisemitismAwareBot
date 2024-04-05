@@ -26,6 +26,13 @@ def generate_answer(text):
         return f"Oops!! Some problems with openAI. Reason: {e}"
 
     return result
+
+
+def profile_info(username):
+    instance = 'https://nitter.privacydev.net'
+    profile = scraper.get_profile_info(username, instance=instance)
+    return profile
+
 def create_tweets_dataset(username,num_of_tweets):
     instance='https://nitter.privacydev.net'
     tweets = scraper.get_tweets(username,mode='user',number=num_of_tweets, instance=instance)
@@ -61,17 +68,17 @@ def analyse_tweets(df):
             print(f"{text}, Answer: {answer}")
             if answer.lower() == 'yes':
                 antisemitic_posts += 1
-                df.at[index, 'antisemitic_posts'] = True
-                df.at[index, 'non_antisemitic_posts'] = False
+                df.at[index, 'antisemitic_post'] = True
+                df.at[index, 'non_antisemitic_post'] = False
             elif answer.lower() == 'no':
                 non_antisemitic_posts += 1
-                df.at[index, 'antisemitic_posts'] = False
-                df.at[index, 'non_antisemitic_posts'] = True
+                df.at[index, 'antisemitic_post'] = False
+                df.at[index, 'non_antisemitic_post'] = True
     return df
 def create_piechart(df):
     if not df['date'].empty:
         labels = 'Non-Antisemitic Posts', 'Antisemitic Posts'
-        sizes = [df['non_antisemitic_posts'].sum(), df['antisemitic_posts'].sum()]
+        sizes = [df['non_antisemitic_post'].sum(), df['antisemitic_post'].sum()]
         fig1, ax1 = plt.subplots()
         ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
         ax1.axis('equal')  # Equal aspect ratio ensures a circular pie chart
