@@ -10,6 +10,8 @@ from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesMan
 from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
 import Community.community_resources
+from Twitter_analysis import twitter_function
+
 
 bot = telebot.TeleBot(keys.telegram_token)
 
@@ -302,6 +304,23 @@ def community_command(message):
         message.chat.id,
         f"{Community.community_resources.print_resources()}"
     )
+
+
+@bot.message_handler(commands=['twitter_analysis'])
+def twitter_analysis(message):
+    bot.send_message(
+        message.chat.id,
+        f"Input username"
+    )
+    bot.register_next_step_handler(message, scrap_tweets)
+
+def scrap_tweets(message):
+    username = message.text
+    dataset = twitter_function.create_tweets_dataset(username, 15)
+    analysed_dataset = twitter_function.analyse_tweets(dataset)
+    twitter_function.create_piechart(analysed_dataset)
+    with open('piechart.png', 'rb') as photo:
+        bot.send_photo(message.chat.id, photo)
 
 
 bot.polling()
