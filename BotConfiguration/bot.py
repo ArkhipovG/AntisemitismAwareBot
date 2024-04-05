@@ -1,3 +1,4 @@
+from Twitter_analysis import twitter_function
 import telebot
 import openai
 import random
@@ -10,8 +11,6 @@ from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesMan
 from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
 import Community.community_resources
-from Twitter_analysis import twitter_function
-
 
 bot = telebot.TeleBot(keys.telegram_token)
 
@@ -298,6 +297,7 @@ def register_is_online(message, title, info, date):
     bot.send_message(message.chat.id, f"Incident successfully registered")
     bot.send_message(message.chat.id, f"{IncidentsManager.all_items()}")
 
+
 @bot.message_handler(commands=['community'])
 def community_command(message):
     bot.send_message(
@@ -310,17 +310,40 @@ def community_command(message):
 def twitter_analysis(message):
     bot.send_message(
         message.chat.id,
-        f"Input username"
+        f"Who you want to check for antisemitism?"
     )
     bot.register_next_step_handler(message, scrap_tweets)
 
+
 def scrap_tweets(message):
+    bot.send_message(
+        message.chat.id,
+        f"Loading..."
+    )
     username = message.text
     dataset = twitter_function.create_tweets_dataset(username, 15)
     analysed_dataset = twitter_function.analyse_tweets(dataset)
     twitter_function.create_piechart(analysed_dataset)
-    with open('piechart.png', 'rb') as photo:
-        bot.send_photo(message.chat.id, photo)
+    if not analysed_dataset['date'].empty:
+        with open('piechart.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        if analysed_dataset['non_antisemitic_posts'].sum() < analysed_dataset['antisemitic_posts'].sum():
+            bot.send_message(
+                message.chat.id,
+                f"This user is antisemitic. \nWe added him/her to our antisemitic database."
+                f"\nYou can check it out here: /antisemitic_db"
+            )
+        elif analysed_dataset['non_antisemitic_posts'].sum() >= analysed_dataset['antisemitic_posts'].sum():
+            bot.send_message(
+                message.chat.id,
+                f"This user is not antisemitic."
+                f"\nYou can check another one here: \n/twitter_analysis"
+            )
+    else:
+        bot.send_message(
+            message.chat.id,
+            f"Oops. Something went wrong. \nPlease try again. /twitter_analysis"
+        )
 
 
 bot.polling()
