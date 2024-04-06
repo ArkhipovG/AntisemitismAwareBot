@@ -327,7 +327,7 @@ def scrap_tweets(message):
     if not analysed_dataset['date'].empty:
         with open('piechart.png', 'rb') as photo:
             bot.send_photo(message.chat.id, photo)
-        if analysed_dataset['non_antisemitic_post'].sum() < analysed_dataset['antisemitic_post'].sum():
+        if analysed_dataset['antisemitic_post'].sum() > len(analysed_dataset)*0.1:
             profile = twitter_function.profile_info(username)
             if profile:
                 bot.send_message(
@@ -341,7 +341,7 @@ def scrap_tweets(message):
                 f"\nWe added him/her to our antisemitic database."
                 f"\nYou can check it out here: /antisemitic_db"
             )
-        elif analysed_dataset['non_antisemitic_post'].sum() >= analysed_dataset['antisemitic_post'].sum():
+        elif analysed_dataset['antisemitic_post'].sum() <= len(analysed_dataset)*0.1:
             bot.send_message(
                 message.chat.id,
                 f"This user is not antisemitic."

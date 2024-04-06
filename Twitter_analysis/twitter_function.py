@@ -64,7 +64,7 @@ def analyse_tweets(df):
     non_antisemitic_posts = 0
     if not df['date'].empty:
         for index, text in enumerate(df['text']):
-            answer = generate_answer("You are Israeli activist. You must analyze this text for antisemitic language or sentiment. Answer only 'yes' or 'no'.  If the text contains 'Free Palestine' or 'FreePalestine' say yes. You have only one life for answer. Text:" + text)
+            answer = generate_answer("You are Israeli activist. You must analyze this text for antisemitism and antizionism content. Does it contain such content? Answer only 'yes' or 'no'.  If the text contains 'Free Palestine' or 'FreePalestine' answer yes. You have only one life for answer. Text:" + text)
             print(f"{text}, Answer: {answer}")
             if answer.lower() == 'yes':
                 antisemitic_posts += 1
