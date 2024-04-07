@@ -29,13 +29,13 @@ def generate_answer(text):
 
 
 def profile_info(username):
-    instance = 'https://nitter.privacydev.net'
-    profile = scraper.get_profile_info(username, instance=instance)
+    instance = 'https://nitter.no-logs.com'
+    profile = scraper.get_profile_info(username)
     return profile
 
 def create_tweets_dataset(username,num_of_tweets):
-    instance='https://nitter.privacydev.net'
-    tweets = scraper.get_tweets(username,mode='user',number=num_of_tweets, instance=instance)
+    instance='https://nitter.no-logs.com'
+    tweets = scraper.get_tweets(username,mode='user',number=num_of_tweets)
     data = {
     'date':[],
     'link':[],
@@ -85,8 +85,9 @@ def create_piechart(df):
         plt.savefig("piechart.png")
 
 def main():
-    df = create_tweets_dataset('RadioGenoa', num_of_tweets=15)
+    df = create_tweets_dataset('miakhalifa', num_of_tweets=15)
     anylsed_df = analyse_tweets(df)
     create_piechart(anylsed_df)
     return 'piechart.png'
 
+main()
