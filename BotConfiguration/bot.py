@@ -1,3 +1,4 @@
+from Twitter_analysis import twitter_function
 import telebot
 import openai
 import random
@@ -296,12 +297,157 @@ def register_is_online(message, title, info, date):
     bot.send_message(message.chat.id, f"Incident successfully registered")
     bot.send_message(message.chat.id, f"{IncidentsManager.all_items()}")
 
+
 @bot.message_handler(commands=['community'])
 def community_command(message):
     bot.send_message(
         message.chat.id,
         f"{Community.community_resources.print_resources()}"
     )
+
+
+@bot.message_handler(commands=['twitter_analysis'])
+def twitter_analysis(message):
+    bot.send_message(
+        message.chat.id,
+        f"Who you want to check for antisemitism?"
+    )
+    bot.register_next_step_handler(message, scrap_tweets)
+
+
+def scrap_tweets(message):
+    bot.send_message(
+        message.chat.id,
+        f"Loading..."
+    )
+    username = message.text
+    dataset = twitter_function.create_tweets_dataset(username, 15)
+    analysed_dataset = twitter_function.analyse_tweets(dataset)
+    twitter_function.create_piechart(analysed_dataset)
+    if not analysed_dataset['date'].empty:
+        with open('piechart.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        if analysed_dataset['antisemitic_post'].sum() > len(analysed_dataset)*0.1:
+            profile = twitter_function.profile_info(username)
+            if profile:
+                bot.send_message(
+                    message.chat.id,
+                    f"Name: {profile['name']} "
+                    f"\nLocation: {profile['location']} "
+                    f"\nRegistered: {profile['joined']}")
+            bot.send_message(
+                message.chat.id,
+                f"This user is antisemitic. "
+                f"\nWe added him/her to our antisemitic database."
+                f"\nYou can check it out here: /antisemitic_db"
+            )
+        elif analysed_dataset['antisemitic_post'].sum() <= len(analysed_dataset)*0.1:
+            bot.send_message(
+                message.chat.id,
+                f"This user is not antisemitic."
+                f"\nYou can check another one here: \n/twitter_analysis"
+            )
+    else:
+        bot.send_message(
+            message.chat.id,
+            f"Oops. Something went wrong. \nPlease try again. /twitter_analysis"
+        )
+
+
+@bot.message_handler(commands=['twitter_plots'])
+def user_plot_choice(message):
+    bot.send_message(
+        message.chat.id,
+        f"Choose a plot:\n" +
+        f"/Analysis_by_location\n" +
+        f"/Analysis_by_month\n" +
+        f"/Analysis_by_top_10_antisemists\n" +
+        f"/Analysis_by_year\n" +
+        f"/Analysis_by_top_20_tweets\n" +
+        f"/Analysis_by_likes_and_retweets\n" +
+        f"/Set_of_plots"
+    )
+    bot.register_next_step_handler(message, twitter_plots)
+
+
+def twitter_plots(message):
+    if message.text == "/Analysis_by_location":
+        with open('images/analysis_by_location.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"The bar chart illustrates the percentage of antisemitic tweets originating from various countries. Germany "
+            f"exhibits the highest proportion, exceeding 100%, while India and Israel show notably lower percentages, "
+            f"around 35-40%. Countries like Jordan, Palestine, and the United Kingdom display percentages ranging from "
+            f"70-85%. The remaining countries fall within the 45-60% range."
+        )
+    elif message.text == "/Analysis_by_month":
+        with open('images/barchart_by_month.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"The bar chart presents the number of antisemitic posts over several months, from October 2023 to March "
+            f"2024. There's a clear upward trend from October, peaking in January 2024, followed by a decline in February "
+            f"and March. However, even with this decrease, the number of posts in these months remains higher than the "
+            f"initial months of October and November 2023."
+        )
+    elif message.text == "/Analysis_by_top_10_antisemists":
+        with open('images/hist_by_10users.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f'The bar chart ranks the top 10 users with the most antisemitic tweets. There is a significant difference '
+            f'between the user with the highest number of such tweets, "TorahJudaism," and the rest. The remaining users '
+            f'exhibit a more gradual decrease in the number of antisemitic tweets, with "DoveAtherton20" having the least '
+            f'among the top 10.'
+        )
+    elif message.text == "/Analysis_by_year":
+        with open('images/hist_numb_acc_by_year.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"The bar chart displays the number of accounts created each year between 2013 and 2023 that have posted "
+            f"antisemitic content. There's a general trend of increase, with a slight dip in the middle. The number of "
+            f"such accounts is notably higher from 2020 onwards compared to the earlier years."
+        )
+    elif message.text == "/Analysis_by_top_20_tweets":
+        with open('images/lineplot_top20tweets.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"The line chart tracks the number of likes for the top 20 tweets over time, spanning from October 2023 to "
+            f"March 2024. There's a significant spike in likes around mid-November 2023, followed by a general downward "
+            f"trend with some smaller fluctuations. By March 2024, the number of likes for the top tweets is considerably "
+            f"lower than the peak in November."
+        )
+    elif message.text == "/Analysis_by_likes_and_retweets":
+        with open('images/piechart_avarage_likes_retweets.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"""The pie charts compare the average number of retweets and likes for antisemitic and non-antisemitic posts.
+    
+    Retweets: Antisemitic posts receive a significantly higher average number of retweets (57.4%) compared to non-antisemitic posts (42.6%).
+    Likes: The difference is smaller but still present, with antisemitic posts garnering a larger share of average likes (53.2%) than non-antisemitic posts (46.8%)."""
+        )
+    elif message.text == "/Set_of_plots":
+        with open('images/all_plots_combined.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+        bot.send_message(
+            message.chat.id,
+            f"""The set of charts provides an analysis of antisemitic content on the twitter.
+    
+    Top Left - Users: The bar chart shows the top 10 users generating the most antisemitic tweets, with a clear outlier ("TorahJudaism") posting significantly more than the others.
+    
+    Top Right - Monthly Posts: The bar chart illustrates the number of antisemitic posts per month. There's a peak in January, a drop in the following months, and then another rise towards the end of the year.
+    
+    Bottom Left - Likes: The pie chart compares the average number of likes on antisemitic and non-antisemitic posts.
+    While the difference is not as large as with retweets, antisemitic posts still receive more average likes.
+    
+    Bottom Right - Retweets: This pie chart highlights a more substantial discrepancy, with antisemitic posts receiving a considerably higher average number of retweets compared to non-antisemitic posts."""
+        )
+
+
 
 
 bot.polling()
