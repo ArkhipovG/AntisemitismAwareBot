@@ -107,7 +107,9 @@ def help_command(message):
         'To anonymously report incidents of antisemitism encountered online or in communities. press /report\n' +
         'To receive a list of resources to join group discussions, share experiences, and connect with '
         'others interested in combating antisemitism press /community_list\n' +
-        'To receive last updates on antisemitic incidents and news articles related to antisemitism press /latest'
+        'To receive last updates on antisemitic incidents and news articles related to antisemitism press /latest\n' +
+        'To receive combined statistics on Twitter dataset press /twitter_plots\n' +
+        'To analyze Twitter user for antisemitic content press /twitter_analysis\n'
     )
 
 
@@ -216,6 +218,7 @@ def new_update(message, item):
 @bot.message_handler(commands=['text_analyzer'])
 def talk_command(message):
     bot.send_message(
+        +
         message.chat.id,
         "Input your text to analyze for antisemitic language or sentiment"
     )

@@ -35,7 +35,9 @@ def profile_info(username):
 
 def create_tweets_dataset(username,num_of_tweets):
     instance='https://nitter.no-logs.com'
-    tweets = scraper.get_tweets(username,mode='user',number=num_of_tweets)
+    instance2 = 'https://nitter.privacydev.net'
+    instance3 = scraper.get_random_instance()
+    tweets = scraper.get_tweets(username,mode='user',number=num_of_tweets, instance=instance3)
     data = {
     'date':[],
     'link':[],
@@ -64,7 +66,26 @@ def analyse_tweets(df):
     non_antisemitic_posts = 0
     if not df['date'].empty:
         for index, text in enumerate(df['text']):
-            answer = generate_answer("You are Israeli activist. You must analyze this text for antisemitism and antizionism content. Does it contain such content? Answer only 'yes' or 'no'.  If the text contains 'Free Palestine' or 'FreePalestine' answer yes. You have only one life for answer. Text:" + text)
+            answer = generate_answer('''
+            #             Objective: Analyze tweets and determine if they contain antisemitic, anti-Zionist, or anti-Israel content. Respond only with "Yes" or "No".
+            #             Guidelines:
+            #              Antisemitic content:
+            #               References to harmful stereotypes about Jewish people.
+            #               Accusing or condemning Israel of genocide of Palestinians.
+            #               «Free Palestine» or «From the river to the sea» slogans.
+            #               Сlaiming that Israel is doing fake news.
+            #               Conspiracy theories involving Jewish people controlling governments, media, or the world.
+            #               Holocaust denial or trivialization.
+            #               Use of antisemitic slurs or symbols.
+            #              Anti-Zionist content:
+            #               Zionism is fascism or Zionism is racism or Zionism is nazism.
+            #               Demonization of Zionism as a racist or colonialist ideology.
+            #               Denial of Israel's right to exist.
+            #               Comparing Israeli people with nazi and Hitler.
+            #              Anti-Israel content:
+            #               Portraying Israel as an illegitimate or illegal state, often using terms like "apartheid state" or "occupying power».
+            #               Accusing Israel or Israels people of lying.
+            #               Accusing Israels government and Netanyahu of lying. Tweet:''' + text)
             print(f"{text}, Answer: {answer}")
             if answer.lower() == 'yes':
                 antisemitic_posts += 1
@@ -90,4 +111,3 @@ def main():
     create_piechart(anylsed_df)
     return 'piechart.png'
 
-main()
