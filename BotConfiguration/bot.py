@@ -1,9 +1,10 @@
 import telebot
 import openai
+import keys
 
-bot = telebot.TeleBot('7163202910:AAFsjUt2-j0KNtcb-90pTeehCg33H7-HsQc')
+bot = telebot.TeleBot(keys.telegram_token)
 
-openai.api_key = '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'
+openai.api_key = keys.chat_gpt_token
 
 
 def generate_answer(text):
@@ -58,22 +59,37 @@ def help_command(message):
     )
 
 
+# Create dict to save history of conversation
+user_history = []
+
+
 @bot.message_handler(commands=['psychologist'])
 def talk_command(message):
     chat_text = message.text.replace('/psychologist', "Hello! I'm reaching out to engage in a dialogue "
-                                                                   "with you as a psychologist. Please communicate "
-                                                                   "with me in that capacity. Start with "
-                                                                   "'Hello!'").strip()
-    response = generate_answer(chat_text)
-    bot.reply_to(message, response + " To exit conversation press /exit_talk")
+                                                      "with you as a psychologist. Please communicate "
+                                                      "with me in that capacity.").strip()
+    #response = generate_answer(chat_text)
+    bot.reply_to(message, "Hello, I am here to offer my support and guidance. Please feel free to share any thoughts "
+                          "or concerns you may have, and I will do my best to assist you. To exit conversation press "
+                          "/exit_talk")
+    # Save beginning of dialogue
+    user_history.append(f'user: {chat_text}')
     bot.register_next_step_handler(message, continue_conversation)
 
 
 def continue_conversation(message):
     if message.text.lower() == '/exit_talk':
-        bot.reply_to(message, "Exiting conversation. You can start again with /talk_with_AI_Psychologist.")
+        bot.reply_to(message, "Exiting conversation. You can start again with /psychologist")
+        # Delete history and exit
+        del user_history[message.chat.id]
         return
-    response = generate_answer(message.text)
+    # Receive history
+    user_history.append(f'user: {message.text}')
+    print(user_history)
+    # Generate response based on history
+    response = generate_answer('Analyze the whole conversation in the list below. Answer only on the last user message'
+                               ' according to the whole conversation.\n'.join(user_history))
+    user_history.append(f'bot: {response}')
     bot.reply_to(message, response)
     bot.register_next_step_handler(message, continue_conversation)
 
