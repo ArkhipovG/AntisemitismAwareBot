@@ -24,4 +24,6 @@ def get_random_article():
     else:
         print("Error:", response.status_code)
 
-print(get_random_article())
+
+if __name__ == '__main__':
+    print(get_random_article())
