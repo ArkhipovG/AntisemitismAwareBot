@@ -61,7 +61,8 @@ def check_answer(message, quiz_state, question):
             quiz_state["correct_answers"] += 1
             bot.send_message(message.chat.id, response_message)
         else:
-            response_message = f"Sorry, the correct answer is {questions.quiz_answers[question]}."
+            chat_gpt_response = generate_answer(f"Question: {question}.Options: {questions.quiz_data[question]} .Correct answer: {questions.quiz_answers[question]}. Explain the answer")
+            response_message = f"Sorry, the correct answer is {questions.quiz_answers[question]} \n \n{chat_gpt_response}."
             bot.send_message(message.chat.id, response_message)
         ask_question(message, quiz_state)
     except (ValueError, IndexError):
