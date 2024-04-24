@@ -44,5 +44,3 @@ quiz_answers = {"The blood libel charge falsely accuses Jews of...?": "All of th
                 "What is the term for the systematic effort by Nazi Germany to annihilate European Jews during World War II?": "The Final Solution",
                 "Which medieval monarch ordered the expulsion of Jews from Spain in 1492?": "Ferdinand II of Aragon"
                 }
-
-print(random_questions)

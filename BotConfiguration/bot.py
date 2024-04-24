@@ -33,7 +33,6 @@ def generate_answer(text):
 
 def start_quiz(message):
     random_questions = random.sample(list(questions.quiz_data.items()), 5)
-
     random_quiz_data = {question: options for question, options in random_questions}
 
     quiz_state = {"questions": list(random_quiz_data.keys()), "correct_answers": 0}
@@ -70,7 +69,7 @@ def check_answer(message, quiz_state, question):
         bot.reply_to(message, response_message)
 
 def end_quiz(message, quiz_state):
-    result_message = f"Quiz ended! You answered {quiz_state['correct_answers']} out of {len(questions.quiz_data)} questions correctly."
+    result_message = f"Quiz ended! You answered {quiz_state['correct_answers']} out of 5 questions correctly."
     bot.reply_to(message, result_message)
 
 
