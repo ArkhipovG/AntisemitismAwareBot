@@ -32,33 +32,37 @@ def generate_answer(text):
 
 
 def start_quiz(message):
-    quiz_state = {"questions": list(questions.quiz_data.keys()), "correct_answers": 0}
+    random_questions = random.sample(list(questions.quiz_data.items()), 5)
+
+    random_quiz_data = {question: options for question, options in random_questions}
+
+    quiz_state = {"questions": list(random_quiz_data.keys()), "correct_answers": 0}
     ask_question(message, quiz_state)
 
 def ask_question(message, quiz_state):
     if quiz_state["questions"]:
         question = random.choice(quiz_state["questions"])
         quiz_state["questions"].remove(question)
-        correct_answer = questions.quiz_data[question][0]
         random.shuffle(questions.quiz_data[question])
         quiz_message = f"{question}\n\n"
         for idx, answer in enumerate(questions.quiz_data[question]):
             quiz_message += f"{idx + 1}. {answer}\n"
         quiz_message += "\nReply with the number of the correct answer."
         bot.reply_to(message, quiz_message)
-        bot.register_next_step_handler(message, check_answer, correct_answer, quiz_state, question)
+        bot.register_next_step_handler(message, check_answer, quiz_state, question)
     else:
         end_quiz(message, quiz_state)
 
-def check_answer(message, correct_answer, quiz_state, question):
+
+def check_answer(message, quiz_state, question):
     try:
         user_answer_index = int(message.text) - 1
-        if questions.quiz_data[question][user_answer_index] == correct_answer:
+        if questions.quiz_data[question][user_answer_index] == questions.quiz_answers[question]:
             response_message = "Correct! 🎉"
             quiz_state["correct_answers"] += 1
             bot.send_message(message.chat.id, response_message)
         else:
-            response_message = f"Sorry, the correct answer is {correct_answer}."
+            response_message = f"Sorry, the correct answer is {questions.quiz_answers[question]}."
             bot.send_message(message.chat.id, response_message)
         ask_question(message, quiz_state)
     except (ValueError, IndexError):
