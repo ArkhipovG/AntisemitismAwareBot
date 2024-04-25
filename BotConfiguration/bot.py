@@ -3,6 +3,7 @@ import telebot
 import openai
 import random
 import keys
+import os
 from DB.harmful_resources_DB.harmful_resources_manager import ResourcesManager
 from DB.harmful_resources_DB.harmful_resources_class import HarmfulResources
 from DB.News_request.get_news import get_random_article
@@ -10,7 +11,9 @@ from Quiz import questions
 from DB.usefull_resources_DB.usefull_resources_manager import UsefulResourcesManager
 from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
+from dynamic_plots import dynamic_plots
 import Community.community_resources
+
 
 
 bot = telebot.TeleBot(keys.telegram_token)
@@ -114,7 +117,8 @@ def help_command(message):
         'others interested in combating antisemitism press /community_list\n' +
         'To receive last updates on antisemitic incidents and news articles related to antisemitism press /latest\n' +
         'To receive combined statistics on Twitter dataset press /twitter_plots\n' +
-        'To analyze Twitter user for antisemitic content press /twitter_analysis\n'
+        'To analyze Twitter user for antisemitic content press /twitter_analysis\n' +
+        'To create a plot according to your prompt press /dynamic_plots\n'
     )
 
 
@@ -469,6 +473,23 @@ def twitter_plots(message):
     Bottom Right - Retweets: This pie chart highlights a more substantial discrepancy, with antisemitic posts receiving a considerably higher average number of retweets compared to non-antisemitic posts."""
         )
 
+
+@bot.message_handler(commands=['dynamic_plots'])
+def user_plot_input(message):
+    bot.send_message(
+        +
+        message.chat.id,
+        "Write your prompt to create plot"
+    )
+    bot.register_next_step_handler(message, plot_creation)
+
+
+def plot_creation(message):
+    user_prompt = message.text
+    dynamic_plots.dynamic_plots(user_prompt)
+    with open('user_prompt_plot.png', 'rb') as photo:
+        bot.send_photo(message.chat.id, photo)
+    os.remove('user_prompt_plot.png')
 
 
 
