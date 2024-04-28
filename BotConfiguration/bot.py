@@ -135,7 +135,7 @@ def talk_command(message):
                           "or concerns you may have, and I will do my best to assist you. To exit conversation press "
                           "/exit_talk")
     # Save beginning of dialogue
-    user_history.append(f'user: {chat_text}')
+    #user_history.append(f'user: {chat_text}')
     bot.register_next_step_handler(message, continue_conversation)
 
 
@@ -149,8 +149,8 @@ def continue_conversation(message):
     user_history.append(f'user: {message.text}')
     print(user_history)
     # Generate response based on history
-    response = generate_answer('Analyze the whole conversation in the list below. Answer only on the last user message'
-                               ' according to the whole conversation.\n'.join(user_history))
+    response = generate_answer('Analyze the whole conversation in the list below. Answer only on the last user message.'
+                               ' Last message is the last element of the list. Answer like you are a human psychologist and you are talking with patient\n'.join(user_history))
     user_history.append(f'bot: {response}')
     bot.reply_to(message, response)
     bot.register_next_step_handler(message, continue_conversation)
