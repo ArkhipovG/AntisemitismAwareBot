@@ -26,7 +26,8 @@ def generate_answer(text):
 
 def dynamic_plots(user_prompt):
     created = False
-    while not created:
+    tries = 0
+    while not created or tries > 10:
         try:
             prompt = user_prompt
 
@@ -36,13 +37,19 @@ def dynamic_plots(user_prompt):
                                        f"{prompt}"
                                        "Your answer must be only finished Python code, which can be executed.\n"
                                        "Nobody will be correcting it.\n"
+                                       "You have 'antisemitic_attacks.csv' file with columns 'title', 'date', 'link', 'year', 'month' and 'country', but you dont need to use this file everytime"
                                        "x and y must have same first dimension.\n"
                                        "Save figure with name 'user_prompt_plot.png'")
 
             print(gpt_code)
 
             exec(gpt_code)
+            tries += 1
             created = True
-        except (ValueError, SyntaxError):
-            print(f"Created: {created}")
-            print("Something went wrong. I will try again")
+        except (ValueError, SyntaxError, KeyError):
+            print(f"\nCreated: {created}\n")
+            print("\nSomething went wrong. I will try again\n")
+    if not created:
+        print("Sorry, I can't create plot with your prompt. Try again.\n")
+
+#dynamic_plots("Create pie chart on antisemitic attacks by country, if number of accidents more than 50")
