@@ -13,8 +13,9 @@ from DB.incidents_db.incidents_class import Incidents
 from DB.incidents_db.incidents_manager import IncidentsManager
 from dynamic_plots import dynamic_plots
 import Community.community_resources
-
-
+import chart_studio.plotly as py
+import chart_studio
+chart_studio.tools.set_credentials_file(username='ArkhipovG', api_key='9VPJX0igNYT5d1UMwKTE')
 
 bot = telebot.TeleBot(keys.telegram_token)
 
@@ -71,7 +72,8 @@ def check_answer(message, quiz_state, question):
             quiz_state["correct_answers"] += 1
             bot.send_message(message.chat.id, response_message)
         else:
-            chat_gpt_response = generate_answer(f"Question: {question}.Options: {questions.quiz_data[question]} .Correct answer: {questions.quiz_answers[question]}. Explain the answer")
+            chat_gpt_response = generate_answer(
+                f"Question: {question}.Options: {questions.quiz_data[question]} .Correct answer: {questions.quiz_answers[question]}. Explain the answer")
             response_message = f"Sorry, the correct answer is {questions.quiz_answers[question]} \n \n{chat_gpt_response}."
             bot.send_message(message.chat.id, response_message)
         ask_question(message, quiz_state)
@@ -353,7 +355,7 @@ def scrap_tweets(message):
     if not analysed_dataset['date'].empty:
         with open('piechart.png', 'rb') as photo:
             bot.send_photo(message.chat.id, photo)
-        if analysed_dataset['antisemitic_post'].sum() > len(analysed_dataset)*0.1:
+        if analysed_dataset['antisemitic_post'].sum() > len(analysed_dataset) * 0.1:
             profile = twitter_function.profile_info(username)
             if profile:
                 bot.send_message(
@@ -367,7 +369,7 @@ def scrap_tweets(message):
                 f"\nWe added him/her to our antisemitic database."
                 f"\nYou can check it out here: /antisemitic_db"
             )
-        elif analysed_dataset['antisemitic_post'].sum() <= len(analysed_dataset)*0.1:
+        elif analysed_dataset['antisemitic_post'].sum() <= len(analysed_dataset) * 0.1:
             bot.send_message(
                 message.chat.id,
                 f"This user is not antisemitic."
@@ -479,18 +481,21 @@ def user_plot_input(message):
     bot.send_message(
         +
         message.chat.id,
-        "Write your prompt to create plot"
+        "You have 'antisemitic_attacks.csv' file which contains antisemitic accidents between 2021 and 2024 with columns 'title', 'date', 'link', 'year', 'month' and 'country'\n"
+        "You can ask bot to create a plot from it\n"
+        "Write your prompt here:"
     )
     bot.register_next_step_handler(message, plot_creation)
 
 
 def plot_creation(message):
     user_prompt = message.text
-    dynamic_plots.dynamic_plots(user_prompt)
-    with open('user_prompt_plot.png', 'rb') as photo:
-        bot.send_photo(message.chat.id, photo)
-    os.remove('user_prompt_plot.png')
-
+    fig = dynamic_plots.dynamic_plots(user_prompt)
+    bot.send_message(
+        +
+        message.chat.id,
+        f"{fig}"
+    )
 
 
 bot.polling()
