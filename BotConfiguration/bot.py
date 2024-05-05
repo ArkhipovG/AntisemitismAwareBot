@@ -15,7 +15,7 @@ from dynamic_plots import dynamic_plots
 import Community.community_resources
 import chart_studio.plotly as py
 import chart_studio
-chart_studio.tools.set_credentials_file(username='ArkhipovG', api_key='9VPJX0igNYT5d1UMwKTE')
+chart_studio.tools.set_credentials_file(username='AntisemitismCombatBot', api_key=keys.plotly_token)
 
 bot = telebot.TeleBot(keys.telegram_token)
 
