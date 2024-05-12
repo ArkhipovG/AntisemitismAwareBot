@@ -15,6 +15,7 @@ from dynamic_plots import dynamic_plots
 import Community.community_resources
 import chart_studio.plotly as py
 import chart_studio
+from sentiments import sentiments
 chart_studio.tools.set_credentials_file(username='AntisemitismCombatBot', api_key=keys.plotly_token)
 
 bot = telebot.TeleBot(keys.telegram_token)
@@ -497,5 +498,17 @@ def plot_creation(message):
         f"{fig}"
     )
 
+@bot.message_handler(commands=['sentiments'])
+def input_text_on_sent(message):
+    bot.send_message(
+        +
+        message.chat.id,
+        "Input your text to analyze for antisemitic language"
+    )
+    bot.register_next_step_handler(message, sent_analysis)
 
+
+def sent_analysis(message):
+    response = sentiments.predict_sent(message.text)
+    bot.reply_to(message, response)
 bot.polling()
